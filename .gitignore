@@ -1,0 +1,5 @@
+vendor
+firebase_credential.json
+.vscode
+Gopkg.lock
+.env
