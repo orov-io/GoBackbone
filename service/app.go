@@ -9,7 +9,6 @@ import (
 	"runtime"
 
 	"firebase.google.com/go/auth"
-	_ "github.com/lib/pq" // Here we initializes the database
 )
 
 // ServeTestHTTP allows serve http responses from tests.

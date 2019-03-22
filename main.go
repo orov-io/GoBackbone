@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"cloud.google.com/go/storage"
-	_ "github.com/lib/pq"
 	"github.com/orov.io/GoBackbone/service"
 	"github.com/sirupsen/logrus"
 )
@@ -46,7 +45,5 @@ func init() {
 func main() {
 	app := service.App{}
 	app.Initialize()
-
-	// Start and run the server
 	app.Run()
 }
