@@ -32,7 +32,7 @@ type App struct {
 // Initialize start the DB and the router
 func (a *App) Initialize() {
 	a.initializeDB()
-	a.router = gin.Default()
+	a.initializeRouter()
 	a.setCors()
 	a.initializeLogger()
 	a.fetchCredentials()
@@ -51,6 +51,10 @@ func (a *App) Run() {
 	}
 }
 
+func (a *App) initializeRouter() {
+	a.router = gin.Default()
+}
+
 func (a *App) initializeDB() {
 	if !a.appUsesDB() {
 		logrus.Info("No DB connection string found. Skipping DB ")
@@ -62,6 +66,9 @@ func (a *App) initializeDB() {
 }
 
 func (a *App) setCors() {
+	if !isPublicAPI() {
+		return
+	}
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowMethods = []string{"GET", "PUT", "POST", "HEAD", "DELETE", "PATCH", "OPTIONS"}

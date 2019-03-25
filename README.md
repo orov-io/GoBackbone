@@ -25,6 +25,11 @@ The app need 3 variables to run:
 - __PORT__: application port. If you are running the app on an google app engine, this variable is not needed.
 - __ENV__: The environment. Generally, one of [local, dev, prod]. You can add as environments as you want.
 
+There are some optional flags:
+
+- __PUBLIC_API__: If true, enables CORS to make cross domain requests.
+- __GCLOUD_STORAGE_BUCKET__: Allow app to connect to gcloud storage.
+
 ### Using firebase
 
 If you want to use the firebase authentication system, you have two ways to use it:
@@ -186,6 +191,7 @@ gcloud app logs tail -s <service>
 This project is configured to be deployed with bitbucket pipelines. Steps can be shown on `bitbucket-pipelines.yml`.
 You must provide the required variables to your bitbucket project.
 Pairing between branches and environments are:
+
 | Branch   |       gcloud project      |
 | -------- | ------------------------- |
 | Develop  | _dev environmnet_         |

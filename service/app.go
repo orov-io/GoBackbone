@@ -7,11 +7,12 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 
 	"firebase.google.com/go/auth"
 )
 
-// ServeTestHTTP allows serve http responses from tests.
+// ServeTestHTTP allows serve http responses for tests.
 func (a *App) ServeTestHTTP(resp *httptest.ResponseRecorder, req *http.Request) {
 	a.router.ServeHTTP(resp, req)
 }
@@ -38,8 +39,8 @@ func getFirebaseCredentials() string {
 func getDir(dir string) string {
 	_, file, _, _ := runtime.Caller(1)
 	FileDir := filepath.Dir(file)
-	assets := filepath.Join(FileDir, dir)
-	return assets
+	directory := filepath.Join(FileDir, dir)
+	return directory
 }
 
 func dirExist(dir string) bool {
@@ -50,4 +51,12 @@ func dirExist(dir string) bool {
 func dirIsNotEmpty(dir string) bool {
 	files, err := ioutil.ReadDir(dir)
 	return err != nil && len(files) > noFiles
+}
+
+func isPublicAPI() bool {
+	isPublicAPI, err := strconv.ParseBool(os.Getenv("PUBLIC_API"))
+	if err != nil {
+		return false
+	}
+	return isPublicAPI
 }
