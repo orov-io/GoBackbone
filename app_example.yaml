@@ -33,5 +33,7 @@ env_variables:
   # The env
   ENV: prod
 
+  GCLOUD_STORAGE_BUCKET: <storage bucket, if any>
+
 beta_settings:
   cloud_sql_instances: <INSTANCE_CONNECTION_NAME>
