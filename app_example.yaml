@@ -37,3 +37,7 @@ env_variables:
 
 beta_settings:
   cloud_sql_instances: <INSTANCE_CONNECTION_NAME>
+
+endpoints_api_service:
+  name: <endpoint_service_name>
+  rollout_strategy: managed

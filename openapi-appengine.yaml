@@ -1,0 +1,26 @@
+swagger: "2.0"
+info:
+  description: "Golang Backbone template"
+  title: "<title>"
+  version: "0.0.1"
+host: "<appspothost>"
+schemes:
+  - "https"
+paths:
+  "/ping":
+    get:
+      description: "Test if api is alive."
+      operationId: "ping"
+      responses:
+        200:
+          description: "Service is working"
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum:
+                  - OK
+                  - KO
+              message:
+                type: string
