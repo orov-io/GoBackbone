@@ -3,3 +3,6 @@ firebase_credential.json
 .vscode
 Gopkg.lock
 .env
+node_modules
+package-lock.json
+tmp

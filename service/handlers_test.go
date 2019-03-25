@@ -43,3 +43,20 @@ func TestPong(t *testing.T) {
 		})
 	})
 }
+
+func TestPrivatePong(t *testing.T) {
+	Convey("Given a private ping HTTP request (/ping)", t, func() {
+		req := httptest.NewRequest("GET", "/v1/ping", nil)
+		resp := httptest.NewRecorder()
+
+		Convey("When the request is handler by the Router", func() {
+			app := service.App{}
+			app.Initialize()
+			app.ServeTestHTTP(resp, req)
+
+			Convey("Then the response should be a 200", func() {
+				So(resp.Code, ShouldEqual, http.StatusOK)
+			})
+		})
+	})
+}

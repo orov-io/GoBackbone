@@ -123,6 +123,8 @@ There are two ways
 
 ### Traditional way
 
+#### Loading env variables
+
 First, you need to load the .env file:
 
 ```bash
@@ -140,6 +142,16 @@ source ~/.autoenv/activate.sh
 ```
 
 Each time you change your env variables, you must change to the root directori (like ```$cd .```)
+
+#### Running the server locally
+
+If you are developing over this template, you might find it useful to recompile the server when you change a file in it.
+
+GoBackbone provides a runner.conf ready to be user with [fresh](https://github.com/gravityblast/fresh). To run the server:
+
+```bash
+fresh go run main.go
+```
 
 ## GCloud
 
