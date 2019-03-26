@@ -158,6 +158,24 @@ GoBackbone provides a runner.conf ready to be user with [fresh](https://github.c
 fresh go run main.go
 ```
 
+## Testing
+
+Provided test uses [Go Convey](http://goconvey.co/). On `service/handlers_test.go`
+we use an expresive flow as on BDD testing. Plase, maintain clean your tests.
+
+Run test is as simple as:
+
+- Execute this on the terminal
+
+    ```bash
+
+    go get github.com/smartystreets/goconvey
+    $GOPATH/bin/goconvey
+
+    ```
+
+- Then open your browser to [localhost:8080](localhost:8080). Tests will be run from the working directory on down.
+
 ## GCloud
 
 ### Change to your project
