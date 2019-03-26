@@ -73,7 +73,7 @@ func serveTest(req *http.Request, resp *httptest.ResponseRecorder) *service.App 
 }
 
 func getRequestAndResponseRecorder(method, target string, body io.Reader) (*http.Request, *httptest.ResponseRecorder) {
-	req := httptest.NewRequest(method, target, nil)
+	req := httptest.NewRequest(method, target, body)
 	resp := httptest.NewRecorder()
 	return req, resp
 }
