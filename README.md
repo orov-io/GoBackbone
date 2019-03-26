@@ -161,7 +161,7 @@ fresh go run main.go
 ## Testing
 
 Provided test uses [Go Convey](http://goconvey.co/). On `service/handlers_test.go`
-we use an expresive flow as on BDD testing. Plase, maintain clean your tests.
+we use an expresive flow as on BDD testing. Please, maintain clean your tests.
 
 Run test is as simple as:
 
