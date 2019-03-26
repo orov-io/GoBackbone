@@ -21,12 +21,14 @@ COPY . ${workdir}/${service}
 # Install git.
 ## Git is required for fetching dependencies.
 RUN apk update && apk add --no-cache git openssh-client
+
 ## Update ssh hosts
-RUN mkdir -p /root/.ssh && \
-    chmod 0700 /root/.ssh && \
-    ssh-keyscan bitbucket.org > /root/.ssh/known_hosts
+#Uncomment this if you have private bitbucket dependencies
+#RUN mkdir -p /root/.ssh && \
+#    chmod 0700 /root/.ssh && \
+#    ssh-keyscan bitbucket.org > /root/.ssh/known_hosts
 ## Add the keys
-COPY ${key_rsa} /root/.ssh/id_rsa
+#COPY ${key_rsa} /root/.ssh/id_rsa
 
 # Update project dependencies
 ## Installig dep
