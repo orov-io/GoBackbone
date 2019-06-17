@@ -1,0 +1,42 @@
+version: '3'
+services:
+  db:
+    build: ./db
+    volumes:
+      - ./db/pgdata:/pgdata
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - PGDATA=/pgdata
+
+  backbone_service:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+      args:
+        - REPO_PATH
+        - SERVICE_NAME
+    ports:
+      - $PORT:$PORT
+    volumes:
+      - ./:${SERVICE_PATH}
+    environment:
+      - PORT
+      - ENV
+      - PUBLIC_API
+      - GOOGLE_PROJECT_ID
+      - GOOGLE_IDENTITY_API_KEY
+      - GCLOUD_PROJECT
+      - ref
+      - SONAR_TOKEN
+      - FIREBASE_CREDENTIAL
+      - POSTGRES_HOST
+      - POSTGRES_PASSWORD
+      - POSTGRES_USER
+      - POSTGRES_SSL_MODE
+      - SERVICE_DATABASE_NAME
+
+    links:
+      - db

@@ -1,0 +1,25 @@
+###########################
+# Global build args
+###########################
+# change service and workdir with your 
+ARG REPO_PATH
+ARG SERVICE_NAME
+ARG workdir=/go/src/${REPO_PATH}/${SERVICE_NAME}
+############################
+# STEP 1 build executable binary
+############################
+
+FROM golang
+
+ARG workdir
+
+WORKDIR ${workdir}
+COPY . ${workdir}
+RUN echo ${workdir}
+RUN echo ${repoPath}
+RUN echo ${serviceName}
+
+RUN go get github.com/pilu/fresh 
+
+EXPOSE 8080
+ENTRYPOINT fresh go run main.go

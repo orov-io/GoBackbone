@@ -2,31 +2,36 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	firebase "firebase.google.com/go"
 
 	"cloud.google.com/go/storage"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq" // Here we initializes the database
-	"github.com/pressly/goose"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/api/option"
 	"google.golang.org/appengine"
 )
 
-const appName = "service-backbone"
 const (
-	migrationDir     = "../migrations"
-	firebaseFileName = "firebase_credential.json"
+	appName            = "admin_service"
+	migrationDir       = "../migrations"
+	firebaseFileName   = "../firebase_credential.json"
+	production         = "prod"
+	local              = "local"
+	postgresConnection = "POSTGRES_CONNECTION"
 )
 
 // App models the main app
 type App struct {
-	router *gin.Engine
-	db     *sqlx.DB
+	router   *gin.Engine
+	db       *sqlx.DB
+	serverDB *sqlx.DB
+	authApp  *firebase.App
 }
 
 // Initialize start the DB and the router
@@ -35,34 +40,28 @@ func (a *App) Initialize() {
 	a.initializeRouter()
 	a.setCors()
 	a.initializeLogger()
-	a.fetchCredentials()
+	a.initializeAuthSystem()
 	a.initializeRoutes()
+	a.serRouterMode()
 }
 
 // Run starts listening and serving HHTP requests
 func (a *App) Run() {
+	env := os.Getenv("ENV")
 	switch true {
-	case appengine.IsAppEngine():
-		http.Handle("/", a.router)
-		appengine.Main()
+	case env == local:
+		logrus.Infof("Local env")
+		a.router.Run(os.Getenv("PORT"))
 
 	default:
-		a.router.Run(os.Getenv("PORT"))
+		logrus.Infof("Running on appengine env")
+		http.Handle("/", a.router)
+		appengine.Main()
 	}
 }
 
 func (a *App) initializeRouter() {
 	a.router = gin.Default()
-}
-
-func (a *App) initializeDB() {
-	if !a.appUsesDB() {
-		logrus.Info("No DB connection string found. Skipping DB ")
-		return
-	}
-	a.checkAndDoDBUpdates()
-	a.connectToDB()
-	a.assertDBConnection()
 }
 
 func (a *App) setCors() {
@@ -89,6 +88,11 @@ func (a *App) initializeLogger() {
 	}
 }
 
+func (a *App) initializeAuthSystem() {
+	a.fetchCredentials()
+	a.initAuthApp()
+}
+
 func (a *App) fetchCredentials() {
 	if !mustFetchFirebaseCredentials() {
 		return
@@ -97,38 +101,22 @@ func (a *App) fetchCredentials() {
 	saveCredentialFile(credentials)
 }
 
-func (a *App) appUsesDB() bool {
-	datastoreName := os.Getenv("POSTGRES_CONNECTION")
-	return datastoreName != ""
+func (a *App) initAuthApp() {
+	ctx := context.Background()
+
+	firebaseFile := getDir(firebaseFileName)
+	opt := option.WithCredentialsFile(firebaseFile)
+	app, err := firebase.NewApp(ctx, nil, opt)
+	if err != nil {
+		logrus.Fatalf("error initializing app: %v\n", err)
+	}
+	a.authApp = app
 }
 
-func (a *App) checkAndDoDBUpdates() {
-	migrations := getMigrationsPath()
-	datastoreName := os.Getenv("POSTGRES_CONNECTION")
-	gooseDB, err := sql.Open("postgres", datastoreName)
-	if err != nil {
-		logrus.Fatalf("Error Opening gooseDB: %v\n", err)
-	}
-	err = goose.Up(gooseDB, migrations)
-	if err != nil {
-		logrus.Fatalf("Error on DB migrations: %v", err)
-	}
-	gooseDB.Close()
-}
-
-func (a *App) connectToDB() {
-	datastoreName := os.Getenv("POSTGRES_CONNECTION")
-	db, err := sqlx.Open("postgres", datastoreName)
-	if err != nil {
-		logrus.Fatalf("Error Opening mainDB: %v\n", err)
-	}
-	a.db = db
-}
-
-func (a *App) assertDBConnection() {
-	err := a.db.Ping()
-	if err != nil {
-		logrus.Fatalf("Error conecting with mainDB: %v\n", err)
+func (a *App) serRouterMode() {
+	env := os.Getenv("ENV")
+	if env == production {
+		gin.SetMode(gin.ReleaseMode)
 	}
 }
 

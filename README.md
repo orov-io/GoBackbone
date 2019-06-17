@@ -1,6 +1,65 @@
-# Web service golang backbone
+# Backbone Service | My Suite
 
-A template to develop API's and Web services. Use it if you see it confortable.
+> A template to develop API's and Web services. Use it if you see it confortable.
+
+## Api documentation
+
+ You can find functional, real state API documentation (with swagger standard) on the gcloud developer portal. For each environment, you can find this documentation visiting the [Developer Portal](https://endpointsportal.${SERVICE_NAME}.cloud.goog/docs)
+
+## About the service
+
+### Configuring the app
+
+You can find a .env file example. Please, use it if you add configuration values as keys or sensible info.
+The app need some variables to run:
+
+- __POSTGRES_HOST__
+- __POSTGRES_PASSWORD__
+- __POSTGRES_USER__
+- __POSTGRES_SSL_MODE__
+- __SERVICE_DATABASE_NAME__
+- __PORT__: application port. If you are running the app on an google app engine, this variable is not needed. By default, in local environment, this service uses 8081
+- __ENV__: The environment. Generally, one of [local, dev, prod]. You can add as environments as you want.
+- __GOOGLE_IDENTITY_API_KEY__: Firebase identity key, needed to obtain custom tokens
+- __ref__: needed to compile the openapi-appengine.example file.
+- __SONAR_TOKEN__: Key to send sonar results to sonarcloud
+- __PROJECT_PATH__: Path to project
+- __SERVICE_NAME__: The name of the service
+
+There are some optional flags:
+
+- __PUBLIC_API__: If true, enables CORS to make cross domain requests.
+- __GCLOUD_STORAGE_BUCKET__: Allow app to connect to gcloud storage.
+
+### Auth credentials
+
+This service is build on top of firebase functionalities. You must provide a firebase credential in order to run the service:
+
+- Put the firebase JSON credential in the App root, and name it 'firebase_credential.json'
+
+- If you use gcloud, leave the 'firebase_credential.json' file on one gcloud storage bucket and provide the bucked name in the '.env' file. Use the __GCLOUD_STORAGE_BUCKET__ variable to do this.
+
+### Dependencies
+
+To run locally this service, you should have installed in your system:
+
+- [goconvey](https://github.com/smartystreets/goconvey)
+- [fresh](https://github.com/gravityblast/fresh)
+- [docker](https://docs.docker.com/install/overview/) & [docker-compose](https://docs.docker.com/compose/)
+- [Go language](https://golang.org/)
+- [make](https://es.wikipedia.org/wiki/Make)
+- [dep](https://github.com/golang/dep)
+
+## Running locally
+
+A make file for local development is provided. Below commands are provided:
+
+- *default* commad simply builds the Dockerfile for the service.
+- *up* command starts up the API and runs it in the background.
+- *logs* tails the logs on the Docker container.
+- *down* shuts down the server.
+- *test* runs any tests in the current directory tree, using goconvey.
+- *clean* shuts down the API and then clears out saved Docker images from your computer. This can be useful when running another image like Postgres which writes information to your local machine and doesn’t clean it up when the container shuts down.
 
 ## General points
 
@@ -14,49 +73,6 @@ This software relies on some other packages and makes the following assumptions:
 
 - This app uses the [jmoiron/sqlx](https://github.com/jmoiron/sqlx). However, the official sql package is used for migrations.
 
-## About the app
-
-### Configuring the app
-
-You can find a .env file example. Please, use it if you add configuration values as keys or sensible info.
-The app need 3 variables to run:
-
-- __POSTGRES_CONNECTION__: The string to connect to database. Leave it empty if your app doesn't need a database conection. See the `example.env` file.
-- __PORT__: application port. If you are running the app on an google app engine, this variable is not needed.
-- __ENV__: The environment. Generally, one of [local, dev, prod]. You can add as environments as you want.
-
-There are some optional flags:
-
-- __PUBLIC_API__: If true, enables CORS to make cross domain requests.
-- __GCLOUD_STORAGE_BUCKET__: Allow app to connect to gcloud storage.
-
-### Using firebase
-
-If you want to use the firebase authentication system, you have two ways to use it:
-
-- Put the firebase JSON credential in the App root, and name it 'firebase_credential.json'
-
-- If you use gcloud, leave the 'firebase_credential.json' file on one gcloud storage bucket and provide the bucked name in the '.env' file. Use the __GCLOUD_STORAGE_BUCKET__ variable to do this.
-
-### Serving statics
-
-#### Assets
-
-To serve static assets, you must ensure that a folder called `assets` exits at root level and is not empty.
-App will autoload and serve this assets for you.
-
-#### Templates
-
-To load templates to use later with gin, you must ensure that a folder callet `templates` exist at root level
-and is not empty. All templates expect have the `.gohtml` extension.
-Templates will be available trought gin-gonic.
-
-### Serving endpoints
-
-You need to load your endpoints in `service/routes.go` file.
-A _non secure_ ping route example is provided. To maintain code cleanliness, use a function for each logical
-group of your API endpoints (see the addRoutes auxiliar function and ad here your routes groups).
-
 ### Migrations
 
 By default, migrations are automatically executed when the app starts.
@@ -69,66 +85,7 @@ goose create <migration-name> sql
 
 ```
 
-### Dependencies
-
-This projects uses [dep](https://github.com/golang/dep) to manage third party dependencies.
-
-#### Init the project
-
-If no Gopkg.toml is present:
-
-```bash
-
-dep ensure init
-
-```
-
-If project has Gopkg.toml:
-
-```bash
-
-dep ensure --update
-
-```
-
-#### Add a dependency
-
-```bash
-
-dep ensure -add <"repo1"> [<"repo2">...]
-
-```
-
-#### Checking status of dependencies
-
-```bash
-
-dep status
-
-```
-
-#### Updating dependencies
-
-```bash
-
-dep ensure --update
-
-```
-
-## Run locally
-
-There are two ways
-
-### Docker way
-
-- [ ] Use docker compose to attach a postgres container.
-- [ ] Force postgres container to use local persistent storage.
-- [ ] Add capability to use the gcloud sql docker.
-- [ ] Use two step dockerfile proccess.
-
-### Traditional way
-
-#### Loading env variables
+### Loading env variables
 
 First, you need to load the .env file:
 
@@ -148,74 +105,28 @@ source ~/.autoenv/activate.sh
 
 Each time you change your env variables, you must change to the root directori (like ```$cd .```)
 
-#### Running the server locally
+### Testing
 
-If you are developing over this template, you might find it useful to recompile the server when you change a file in it.
+Automatic testing can be made outside the docker container. You only need to do 2 things:
 
-GoBackbone provides a runner.conf ready to be user with [fresh](https://github.com/gravityblast/fresh). To run the server:
-
-```bash
-fresh go run main.go
-```
-
-## Testing
-
-Provided test uses [Go Convey](http://goconvey.co/). On `service/handlers_test.go`
-we use an expresive flow as on BDD testing. Please, maintain clean your tests.
-
-Run test is as simple as:
-
-- Execute this on the terminal
-
-    ```bash
-
-    go get github.com/smartystreets/goconvey
-    $GOPATH/bin/goconvey
-
-    ```
-
-- Then open your browser to [localhost:8080](localhost:8080). Tests will be run from the working directory on down.
-
-## GCloud
-
-### Change to your project
+- Assert all vendor packages are install: 
 
 ```bash
-
-gcloud config get-value project # actual project
-gcloud projects list # list your projects
-gcloud config set project <your-project> # change project
-
+make update
 ```
 
-### Conecting to your database
+- Make sure that host name "db" is in your /etc/host file and is actually pointing to localhost (127.0.0.1)
+
+Now, you can run convey througt:
 
 ```bash
-
-gcloud sql connect <dbname> --user=postgres --quiet
-
+make test
 ```
 
-### See app engine console logs
+## tricks
+
+- Rebuild and run service and see logs with one command:
 
 ```bash
-
-gcloud app logs tail -s <service>
-
+make restart logs
 ```
-
-## Deploys
-
-This project is configured to be deployed with bitbucket pipelines. Steps can be shown on `bitbucket-pipelines.yml`.
-You must provide the required variables to your bitbucket project.
-Pairing between branches and environments are:
-
-| Branch   |       gcloud project      |
-| -------- | ------------------------- |
-| Develop  | _dev environmnet_         |
-| Master   | _production environment_  |
-
-Commits pushed on one of this branches will trigger a deploy to the paired project.
-
-- [ ] Provide documentation about pipelines variables.
-- [ ] Provide circleCI (or another CI github compatible tool) integration.

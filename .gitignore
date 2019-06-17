@@ -1,8 +1,15 @@
 vendor
-firebase_credential.json
+firebase_credential*.json
 .vscode
-Gopkg.lock
 .env
 node_modules
 package-lock.json
 tmp
+Gopkg.lock
+app.yaml
+openapi-appengine.yaml
+coverage.out
+report.json
+.scannerwork/
+nohup.out
+db/pgdata/

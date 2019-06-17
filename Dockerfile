@@ -2,21 +2,23 @@
 # Global build args
 ###########################
 # change service and workdir with your 
-ARG service=GoBackbone 
-ARG workdir=/go/src/github.com/orov.io
+ARG service=${SERVICE_NAME}
+ARG repo=${PROJECT_PATH}
+ARG workdir=${repo}/${service}
 ARG key_rsa=./id_rsa
 ############################
 # STEP 1 build executable binary
 ############################
 
-FROM golang:alpine 
+FROM golang:alpine AS build-env
 
 ARG service
 ARG workdir
 ARG key_rsa
 
-WORKDIR ${workdir}/${service}
-COPY . ${workdir}/${service}
+WORKDIR ${workdir}
+COPY . ${workdir}
+
 
 # Install git.
 ## Git is required for fetching dependencies.
@@ -34,12 +36,26 @@ RUN apk update && apk add --no-cache git openssh-client
 ## Installig dep
 RUN go get -u github.com/golang/dep/...
 ## Updating dependencies
-RUN cd ${workdir}/${service}
+RUN cd ${workdir}
 RUN dep ensure -v
 
 # Building the app
-RUN go build -o main
+RUN go build -o app
 
-# Configuring the server
+############################
+# STEP 2 build tiny executable container
+############################
+
+FROM alpine
+
+ARG service
+ARG workdir
+ARG key_rsa
+
+WORKDIR ${workdir}
+COPY --from=build-env ${workdir}/app ${workdir}/
+COPY --from=build-env ${workdir}/migrations/* ${workdir}/migrations/
+RUN apk --update add ca-certificates
+
 EXPOSE 8080
-ENTRYPOINT "./main"
+ENTRYPOINT ./${workdir}/app
